@@ -1,0 +1,92 @@
+class Node:
+  """
+  A node class for the FP-Tree data structure.
+  """
+  def __init__(self, item, count=1):
+    self.item = item
+    self.count = count
+    self.parent = None
+    self.children = {}  # Dictionary to store child nodes (item: Node)
+
+  def __str__(self):
+    return f"{self.item} ({self.count})"
+
+class FPTree:
+  """
+  An FP-Tree data structure class.
+  """
+  def __init__(self):
+    self.root = Node(None)  # Root node with no item
+
+  def add_transaction(self, transaction):
+    """
+    Adds a transaction to the FP-Tree.
+    """
+    current_node = self.root
+    for item in sorted(transaction, reverse=True):  # Sort in descending order of frequency
+      if item in current_node.children:
+        current_node.children[item].count += 1
+        current_node = current_node.children[item]
+      else:
+        new_node = Node(item)
+        new_node.parent = current_node
+        current_node.children[item] = new_node
+        current_node = new_node
+
+  def find_frequent_itemsets(self, min_support):
+    """
+    Finds frequent itemsets from the FP-Tree using recursive conditional pattern base mining.
+    """
+    frequent_itemsets = []
+    for item, node in self.root.children.items():
+      if node.count >= min_support:
+        frequent_itemsets.append([item])
+        frequent_itemsets.extend(self.find_frequent_itemsets_with_suffix(item, node, min_support))
+    return frequent_itemsets
+
+  def find_frequent_itemsets_with_suffix(self, prefix, node, min_support):
+    """
+    Recursive function to find frequent itemsets with a specific suffix pattern base.
+    """
+    conditional_pattern_base = {}
+    parent = node.parent
+    while parent is not None and parent.item is not None:
+      conditional_pattern_base.setdefault(parent.item, []).append(node)
+      parent = parent.parent
+
+    frequent_suffixes = []
+    for item, nodes in conditional_pattern_base.items():
+      # Create a new FP-Tree for the conditional pattern base
+      conditional_tree = FPTree()
+      for child_node in nodes:
+        transaction = child_node.parent.children.copy()
+        del transaction[item]  # Remove the prefix item from the transaction
+        conditional_tree.add_transaction(transaction)
+
+      # Find frequent itemsets in the conditional FP-Tree
+      suffix_itemsets = conditional_tree.find_frequent_itemsets(min_support)
+      for suffix_itemset in suffix_itemsets:
+        # Prepend the prefix to the suffix itemset
+        suffix_itemset.insert(0, item)
+        frequent_suffixes.append(suffix_itemset)
+
+    return frequent_suffixes
+
+# Sample data (replace with your actual data)
+transactions = [["bread", "milk", "cheese"], ["bread", "beer", "eggs"], ["milk", "eggs"], ["beer", "eggs", "wine"]]
+
+# Create an FP-Tree
+tree = FPTree()
+for transaction in transactions:
+  tree.add_transaction(transaction)
+
+# Set minimum support (adjust as needed)
+min_support = 2
+
+# Find frequent itemsets
+frequent_itemsets = tree.find_frequent_itemsets(min_support)
+
+# Print results
+print(f"Frequent itemsets (min support: {min_support}):")
+for itemset in frequent_itemsets:
+  print(f"- {', '.join(itemset)}")

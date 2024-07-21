@@ -1,0 +1,37 @@
+from sklearn.cluster import DBSCAN
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Sample data (replace with your actual data)
+X = np.array([[1, 2], [1.5, 1.8], [5, 8], [8, 8], [1, 0.6], [9, 11]])
+
+# Define epsilon (Eps) - maximum distance between points to be considered neighbors
+eps = 1.5
+
+# Define minimum points (MinPts) - minimum number of neighbors for a point to be a core point
+min_samples = 3
+
+# Create a DBSCAN object
+dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+
+# Train the model on the data (fit)
+dbscan.fit(X)
+
+# Get cluster labels for each data point
+y_pred = dbscan.labels_
+
+# Get the number of clusters (noise points are labeled -1)
+n_clusters = len(set(y_pred)) - (1 if -1 in y_pred else 0)
+
+# Print cluster labels
+print(f"Cluster labels for data points:\n{y_pred}")
+
+# Print number of clusters
+print(f"\nNumber of clusters: {n_clusters}")
+
+# Optional: Plot the data points and color them based on cluster labels
+plt.scatter(X[:, 0], X[:, 1], c=y_pred, s=50, cmap='viridis')
+plt.title('DBSCAN Clustering')
+plt.xlabel('Feature 1')
+ylabel('Feature 2')
+plt.show()

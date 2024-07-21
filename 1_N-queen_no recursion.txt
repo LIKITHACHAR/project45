@@ -1,0 +1,45 @@
+class Board:
+  def __init__(self, size):
+    self.N = size
+    self.queens = [None] * size  # List to store column positions of queens in each row
+
+  def is_queen_safe(self, row, col):
+    # Check for conflicts in rows and diagonals
+    for r, c in enumerate(self.queens):
+      if r == row or c == col or abs(row - r) == abs(col - c):
+        return False
+    return True
+
+  def solve(self):
+    # Iterate through columns to place queens
+    for col in range(self.N):
+      # Try all possible positions in the current column
+      for row in range(self.N):
+        if self.is_queen_safe(row, col):
+          self.queens[row] = col  # Place queen
+          # Check if all queens are placed (reached last row)
+          if col == self.N - 1:
+            self.print_board()  # Print the solution
+          else:
+            # Move to next column for further placement
+            self.solve()
+          # Backtrack: remove queen from current position
+          self.queens[row] = None
+    # No solution found if loop completes
+    print("No solutions found!")
+
+  def print_board(self):
+    for row in range(self.N):
+      for col in range(self.N):
+        if self.queens[row] == col:
+          print("Q", end=" ")
+        else:
+          print(".", end=" ")
+      print()
+
+# Get board size from user
+n = int(input("Enter the size of the chessboard (N): "))
+
+# Create board object and solve the problem
+board = Board(n)
+board.solve()

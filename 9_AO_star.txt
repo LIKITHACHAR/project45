@@ -1,0 +1,92 @@
+from collections import deque
+
+def ao_star_search(graph, start_node, goal_node, heuristic):
+  """
+  Simplified AO* Search on a graph with dynamic cost updates.
+
+  **Note:** This is a simplified version that doesn't handle AND-OR graphs
+          and full consistency maintenance. It's for illustrative purposes.
+
+  Args:
+      graph: A dictionary representing the graph, where keys are nodes and values are lists of (neighbor, cost) tuples.
+      start_node: The starting node for the search.
+      goal_node: The goal node to find.
+      heuristic: A function that takes a node as input and returns a heuristic score (lower score indicates closer to goal).
+
+  Returns:
+      A list containing the nodes visited in the order of exploration,
+      or None if no path is found to the goal.
+  """
+  visited = set()  # Set to keep track of visited nodes
+  open_list = deque([(0, start_node)])  # Open list with (f-score, node) tuples
+  came_from = {}  # Dictionary to store parent nodes for path reconstruction
+
+  while open_list:
+    current_f_score, current_node = open_list.popleft()
+
+    if current_node not in visited:
+      visited.add(current_node)
+
+      if current_node == goal_node:
+        return reconstruct_path(came_from, current_node)
+
+      for neighbor, cost in graph[current_node]:
+        tentative_g_score = current_f_score + cost  # Update g-score (consider dynamic cost updates here)
+        if neighbor not in visited and neighbor not in (n for f, n in open_list):
+          # Add new neighbor with f-score (g + h)
+          open_list.append((tentative_g_score + heuristic(neighbor), neighbor))
+          came_from[neighbor] = current_node
+        elif neighbor in (n for f, n in open_list):
+          # Update existing neighbor if new path has lower g-score
+          existing_f_score, _ = next((f, n) for f, n in open_list if n == neighbor)
+          if tentative_g_score < existing_f_score:
+            open_list.remove((existing_f_score, neighbor))
+            open_list.append((tentative_g_score + heuristic(neighbor), neighbor))
+            came_from[neighbor] = current_node
+
+  return None  # No path found
+
+def reconstruct_path(came_from, current_node):
+  """
+  Reconstructs the path from the came_from dictionary.
+
+  Args:
+      came_from: A dictionary storing the parent node for each explored node.
+      current_node: The goal node.
+
+  Returns:
+      A list of nodes representing the path from start to goal.
+  """
+  path = [current_node]
+  while current_node in came_from:
+    current_node = came_from[current_node]
+    path.append(current_node)
+  path.reverse()  # Reverse to get path from start to goal
+  return path
+
+# Example usage (replace with your specific graph, heuristic, and cost updates)
+def heuristic(node):
+  # Implement your heuristic function here
+  return 0  # Placeholder heuristic
+
+graph = {
+  'A': [('B', 2), ('C', 4)],
+  'B': [('D', 1), ('E', 3)],
+  'C': [('F', 5)],
+  'D': [('G', 1)],
+  'E': [('G', 2)],
+  'F': []
+}
+
+start_node = 'A'
+goal_node = 'G'
+
+# Simulate a cost update (e.g., obstacle encountered)
+graph['C'][0] = ('F', 1)  # Update cost from C to F
+
+path = ao_star_search(graph, start_node, goal_node, heuristic)
+
+if path:
+  print(f"Path to goal found: {path}")
+else:
+  print("No path to goal found.")

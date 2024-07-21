@@ -1,0 +1,28 @@
+from sklearn.svm import SVR
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+# Sample data (replace with your actual data)
+X = np.array([[1, 2], [3, 1], [4, 0], [5, 3]])
+y = np.array([5, 7, 8, 11])
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Create the SVR model with linear kernel
+regressor = SVR(kernel='linear')  # Adjust kernel for non-linear data
+
+# Train the model on the training data
+regressor.fit(X_train, y_train)
+
+# Predict target values for testing data
+y_pred = regressor.predict(X_test)
+
+# Evaluate the mean squared error (MSE)
+mse = mean_squared_error(y_test, y_pred)
+print(f"Mean Squared Error: {mse:.2f}")
+
+# Predict for a new data point (optional)
+new_data = np.array([[6, 2]])
+predicted_value = regressor.predict(new_data)[0]
+print(f"\nPredicted value for new data point: {predicted_value:.2f}")

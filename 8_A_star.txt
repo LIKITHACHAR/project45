@@ -1,0 +1,83 @@
+from heapq import heappush, heappop
+
+def a_star_search(graph, start_node, goal_node, heuristic):
+  """
+  Performs A* Search on a graph using a heuristic function.
+
+  Args:
+      graph: A dictionary representing the graph, where keys are nodes and values are lists of adjacent nodes.
+      start_node: The starting node for the search.
+      goal_node: The goal node to find.
+      heuristic: A function that takes a node as input and returns a heuristic score (lower score indicates closer to goal).
+
+  Returns:
+      A list containing the nodes visited in the order of exploration,
+      or None if no path is found to the goal.
+  """
+  visited = set()  # Set to keep track of visited nodes
+  priority_queue = []  # Priority queue for A* search with f-score
+
+  # f-score (total cost) = g-score (cost from start) + h-score (heuristic)
+  g_score = {start_node: 0}  # Dictionary to store g-scores for nodes
+  heappush(priority_queue, (0, start_node))  # Add starting node with its f-score (h(start_node))
+
+  while priority_queue:
+    current_f_score, current_node = heappop(priority_queue)  # Get node with lowest f-score
+
+    if current_node not in visited:
+      visited.add(current_node)
+
+      if current_node == goal_node:
+        return reconstruct_path(g_score, current_node)  # Reconstruct path from g-scores
+
+      for neighbor, edge_weight in graph[current_node].items():
+        if neighbor not in visited:
+          tentative_g_score = g_score[current_node] + edge_weight
+          if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+            g_score[neighbor] = tentative_g_score
+            heappush(priority_queue, (tentative_g_score + heuristic(neighbor), neighbor))  # Update f-score and add neighbor
+
+  return None  # No path found
+
+def reconstruct_path(came_from, current_node):
+  """
+  Reconstructs the path from the g-score dictionary.
+
+  Args:
+      came_from: A dictionary storing the parent node for each explored node.
+      current_node: The goal node.
+
+  Returns:
+      A list of nodes representing the path from start to goal.
+  """
+  path = [current_node]
+  while current_node in came_from:
+    current_node = came_from[current_node]
+    path.append(current_node)
+  path.reverse()  # Reverse to get path from start to goal
+  return path
+
+# Example usage (replace with your specific graph, heuristic, and edge weights)
+def heuristic(node):
+  # Implement your heuristic function here (e.g., Manhattan distance for a maze)
+  # This example assumes a simple heuristic with a fixed cost for each node
+  return len(graph[node])  # Lower cost for nodes with fewer neighbors
+
+graph = {
+  'A': {'B': 1, 'C': 3},
+  'B': {'D': 2, 'E': 4},
+  'C': {'F': 5},
+  'D': {'G': 1},
+  'E': {'G': 2},
+  'F': {}
+}
+
+start_node = 'A'
+goal_node = 'G'
+
+path = a_star_search(graph, start_node, goal_node, heuristic)
+
+if path:
+  print(f"Path to goal found: {path}")
+else:
+  print("No path to goal found.")

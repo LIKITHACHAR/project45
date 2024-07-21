@@ -1,0 +1,27 @@
+from sklearn import tree
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Sample data (replace with your actual data)
+X = [[1, 2, 1], [2, 1, 2], [3, 2, 1], [1, 4, 1], [5, 1, 0]]
+y = ['A', 'A', 'B', 'A', 'B']
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Create the decision tree classifier
+clf = tree.DecisionTreeClassifier()
+
+# Train the model on the training data
+clf = clf.fit(X_train, y_train)
+
+# Predict class labels for the testing data
+y_pred = clf.predict(X_test)
+
+# Evaluate the accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+
+# Visualize the decision tree (optional)
+# from sklearn.tree import export_graphviz
+# export_graphviz(clf, out_file="tree.dot", feature_names=["F1", "F2", "F3"])

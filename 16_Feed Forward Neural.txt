@@ -1,0 +1,91 @@
+import numpy as np
+
+class NeuralNetwork:
+  """
+  A simple Feed-Forward Neural Network for classification.
+  """
+  def __init__(self, input_size, hidden_size, output_size, learning_rate=0.1):
+    """
+    Initializes the neural network with random weights and biases.
+
+    Args:
+        input_size: Number of features in the input data.
+        hidden_size: Number of neurons in the hidden layer.
+        output_size: Number of output neurons (number of classes).
+        learning_rate: Learning rate for weight updates during training.
+    """
+    self.input_size = input_size
+    self.hidden_size = hidden_size
+    self.output_size = output_size
+    self.learning_rate = learning_rate
+
+    # Initialize weights and biases with random values
+    self.weights1 = np.random.rand(self.input_size, self.hidden_size)
+    self.biases1 = np.random.rand(self.hidden_size)
+    self.weights2 = np.random.rand(self.hidden_size, self.output_size)
+    self.biases2 = np.random.rand(self.output_size)
+
+  def sigmoid(self, x):
+    """
+    Sigmoid activation function.
+    """
+    return 1 / (1 + np.exp(-x))
+
+  def softmax(self, x):
+    """
+    Softmax activation function for multi-class classification.
+    """
+    return np.exp(x) / np.sum(np.exp(x), axis=0)
+
+  def predict(self, X):
+    """
+    Predicts class labels for a given input data.
+
+    Args:
+        X: Input data (a 2D array).
+
+    Returns:
+        A list of predicted class labels.
+    """
+    # Forward propagation
+    hidden_layer_activation = self.sigmoid(np.dot(X, self.weights1) + self.biases1)
+    output_layer_activation = self.softmax(np.dot(hidden_layer_activation, self.weights2) + self.biases2)
+
+    # Get the index of the maximum value in the output layer for each data point
+    return np.argmax(output_layer_activation, axis=1)
+
+  def train(self, X, y, epochs=100):
+    """
+    Trains the neural network on the provided data.
+
+    Args:
+        X: Input data (a 2D array).
+        y: Labels (a 1D array).
+        epochs: Number of training epochs.
+    """
+    for epoch in range(epochs):
+      # Forward propagation
+      hidden_layer_activation = self.sigmoid(np.dot(X, self.weights1) + self.biases1)
+      output_layer_activation = self.softmax(np.dot(hidden_layer_activation, self.weights2) + self.biases2)
+
+      # Backpropagation
+      # Calculate errors
+      output_error = y - output_layer_activation
+      hidden_error = np.dot(output_error, self.weights2.T) * hidden_layer_activation * (1 - hidden_layer_activation)
+
+      # Update weights and biases
+      self.weights2 += self.learning_rate * np.dot(hidden_layer_activation.T, output_error)
+      self.biases2 += self.learning_rate * output_error.sum(axis=0)
+      self.weights1 += self.learning_rate * np.dot(X.T, hidden_error)
+      self.biases1 += self.learning_rate * hidden_error.sum(axis=0)
+
+      # Print loss (optional)
+      # loss = -np.mean(np.sum(y * np.log(output_layer_activation), axis=1))
+      # print(f"Epoch: {epoch+1}, Loss: {loss:.4f}")
+
+# Example usage (replace with your actual data)
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([0, 1, 1, 0])  # Assuming binary classification (0 or 1)
+
+# Define and train the neural network
+model = NeuralNetwork(input_size=2, hidden_size=4, output_

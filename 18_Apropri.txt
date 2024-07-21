@@ -1,0 +1,18 @@
+from mlxtend.frequent_patterns import apriori
+from mlxtend.preprocessing import TransactionEncoder
+
+# Sample data (replace with your actual data)
+dataset = [['bread', 'milk'], ['bread', 'cheese', 'beer'], ['bread', 'beer'], ['milk', 'eggs'], ['milk', 'eggs', 'spam'], ['eggs', 'spam', 'wine']]
+
+# Encode transactions using one-hot encoding
+encoder = TransactionEncoder()
+encoded_data = encoder.fit_transform(dataset)
+
+# Set minimum support (adjust as needed)
+min_support = 0.5
+
+# Apply Apriori algorithm with minimum support
+frequent_itemsets = apriori(encoded_data, min_support=min_support, use_colnames=True)
+
+# Print results (frequent itemsets with support)
+print(frequent_itemsets)

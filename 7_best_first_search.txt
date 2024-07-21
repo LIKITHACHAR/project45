@@ -1,0 +1,58 @@
+from heapq import heappush, heappop
+
+def best_first_search(graph, start_node, heuristic):
+  """
+  Performs Best-First Search on a graph using a heuristic function.
+
+  Args:
+      graph: A dictionary representing the graph, where keys are nodes and values are lists of adjacent nodes.
+      start_node: The starting node for the search.
+      heuristic: A function that takes a node as input and returns a heuristic score (lower score indicates closer to goal).
+
+  Returns:
+      A list containing the nodes visited in the order of exploration,
+      or None if no path is found to the goal.
+  """
+  visited = set()  # Set to keep track of visited nodes
+  priority_queue = []  # Priority queue for BFS with heuristic
+
+  heappush(priority_queue, (heuristic(start_node), start_node))  # Add starting node with its heuristic score
+
+  while priority_queue:
+    current_score, current_node = heappop(priority_queue)  # Get node with lowest heuristic score
+
+    if current_node not in visited:
+      visited.add(current_node)
+
+      if is_goal(current_node):  # Check if goal node is found (replace with your goal check)
+        return [node for _, node in priority_queue] + [current_node]  # Reconstruct path from queue
+
+      for neighbor in graph[current_node]:
+        if neighbor not in visited:
+          heappush(priority_queue, (heuristic(neighbor), neighbor))  # Add neighbors with their heuristic scores
+
+  return None  # No path found
+
+# Example usage (replace with your specific graph and heuristic)
+def heuristic(node):
+  # Implement your heuristic function here (e.g., Manhattan distance for a maze)
+  # This example assumes a simple heuristic with a fixed cost for each node
+  return len(graph[node])  # Lower cost for nodes with fewer neighbors
+
+graph = {
+  'A': ['B', 'C'],
+  'B': ['D', 'E'],
+  'C': ['F'],
+  'D': [],
+  'E': ['F'],
+  'F': ['G']
+}
+
+start_node = 'A'
+
+path = best_first_search(graph, start_node, heuristic)
+
+if path:
+  print(f"Path to goal found: {path}")
+else:
+  print("No path to goal found.")

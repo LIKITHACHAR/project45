@@ -1,0 +1,44 @@
+import numpy as np
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+
+# Sample data (replace with your actual data)
+X = np.array([1, 2, 3, 4, 5])
+y = np.array([2, 6, 11, 16, 22])
+
+# Define the degree of the polynomial
+degree = 2
+
+# Create a PolynomialFeatures object to transform data
+poly_features = PolynomialFeatures(degree=degree, include_bias=False)
+
+# Transform features to include polynomial terms
+X_poly = poly_features.fit_transform(X.reshape(-1, 1))
+
+# Create the linear regression model
+model = LinearRegression()
+
+# Train the model on the transformed data
+model.fit(X_poly, y)
+
+# Get the coefficients (including those for polynomial terms)
+coefficients = np.append([model.intercept_], model.coef_)
+
+# Print the polynomial equation (symbolic representation)
+print(f"Polynomial equation (symbolic):")
+for deg, coeff in enumerate(coefficients):
+  if coeff != 0:
+    if deg == 0:
+      print(f"{coeff:.2f}", end="")  # Print constant term
+    elif deg == 1:
+      print(f"{coeff:.2f}x", end="")  # Print linear term with 'x'
+    else:
+      print(f"{coeff:.2f}x^{deg}", end="")  # Print higher degree terms
+  if deg != len(coefficients) - 1 and coeff != 0:
+    print(" + ", end="")  # Add '+' between terms
+
+# Predict using the model (you can use new data points here)
+new_data = np.array([6])
+new_data_poly = poly_features.transform(new_data.reshape(-1, 1))
+predicted_value = model.predict(new_data_poly)[0]
+print(f"\nPredicted value for new data point ({new_data[0]}): {predicted_value:.2f}")

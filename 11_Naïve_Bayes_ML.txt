@@ -1,0 +1,105 @@
+import math
+
+def calculate_class_probability(data, class_label, labels, class_counts):
+  """
+  Calculates the probability of a data point belonging to a specific class.
+
+  Args:
+      data: A list of data points.
+      class_label: The class label to calculate probability for.
+      labels: List of all class labels.
+      class_counts: Dictionary containing counts of each class.
+
+  Returns:
+      The probability of the data belonging to the class_label.
+  """
+  total_data_points = sum(class_counts.values())
+  class_probability = class_counts[class_label] / total_data_points
+
+  # Apply Laplace smoothing to avoid zero probabilities for unseen features
+  for feature, value in enumerate(data):
+    feature_counts = class_conditional_probabilities[class_label][feature]
+    total_feature_values = sum(feature_counts.values())
+    class_probability *= (feature_counts.get(value, 0) + 1) / (total_feature_values + len(set(data[feature] for data in training_data)))
+
+  return class_probability
+
+def calculate_posterior(data, labels, class_conditional_probabilities, class_counts):
+  """
+  Calculates the posterior probability for each class given the data point.
+
+  Args:
+      data: A list of data points.
+      labels: List of all class labels.
+      class_conditional_probabilities: Dictionary containing conditional probabilities for each feature in each class.
+      class_counts: Dictionary containing counts of each class.
+
+  Returns:
+      A dictionary containing posterior probabilities for each class label.
+  """
+  posteriors = {label: 0 for label in labels}
+  for label in labels:
+    class_prob = calculate_class_probability(data, label, labels, class_counts)
+    posteriors[label] = class_prob
+
+  # Normalize probabilities to sum to 1
+  total_prob = sum(posteriors.values())
+  for label in labels:
+    posteriors[label] /= total_prob
+  return posteriors
+
+def train(training_data, labels):
+  """
+  Trains the Naive Bayes model on the provided data.
+
+  Args:
+      training_data: A list of lists, where each inner list represents a data point.
+      labels: List of class labels corresponding to the data points.
+
+  Returns:
+      A dictionary containing class conditional probabilities and class counts.
+  """
+  class_counts = {label: 0 for label in set(labels)}
+  class_conditional_probabilities = {label: {} for label in set(labels)}
+
+  for data, label in zip(training_data, labels):
+    class_counts[label] += 1
+    for feature_index, feature_value in enumerate(data):
+      if feature_value not in class_conditional_probabilities[label]:
+        class_conditional_probabilities[label][feature_index] = {}
+      class_conditional_probabilities[label][feature_index][feature_value] = class_conditional_probabilities[label][feature_index].get(feature_value, 0) + 1
+
+  return class_conditional_probabilities, class_counts
+
+def predict(data, class_conditional_probabilities, class_counts, labels):
+  """
+  Predicts the class label for a new data point.
+
+  Args:
+      data: A list of data points.
+      class_conditional_probabilities: Dictionary containing conditional probabilities for each feature in each class.
+      class_counts: Dictionary containing counts of each class.
+      labels: List of all class labels.
+
+  Returns:
+      The predicted class label.
+  """
+  posteriors = calculate_posterior(data, labels, class_conditional_probabilities, class_counts)
+  predicted_label = max(posteriors, key=posteriors.get)
+  return predicted_label
+
+# Sample data (replace with your actual data)
+training_data = [
+  [1, 'sunny', 'high'],
+  [0, 'rainy', 'high'],
+  [1, 'sunny', 'normal'],
+  [0, 'overcast', 'high'],
+  [1, 'rainy', 'normal'],
+]
+
+labels = ['yes', 'no']
+
+# Train the model
+class_conditional_probabilities, class_counts = train(training_data, labels)
+
+

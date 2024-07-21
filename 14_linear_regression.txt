@@ -1,0 +1,28 @@
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# Sample data (replace with your actual data)
+X = np.array([[1, 2], [3, 1], [4, 0], [5, 3]])
+y = np.array([5, 7, 8, 11])
+
+# Create the linear regression model
+model = LinearRegression()
+
+# Train the model on the data
+model.fit(X, y)
+
+# Get the coefficients (slope and intercept)
+slope = model.coef_[0]
+intercept = model.intercept_
+
+print(f"Slope (b1): {slope:.2f}")
+print(f"Intercept (b0): {intercept:.2f}")
+
+# Predict using the model
+new_data = np.array([[6, 2]])
+predicted_value = model.predict(new_data)[0]
+print(f"Predicted value for new data point: {predicted_value:.2f}")
+
+# Alternative prediction using coefficients
+predicted_value_alt = slope * new_data[0][0] + intercept
+print(f"Alternative predicted value: {predicted_value_alt:.2f}")

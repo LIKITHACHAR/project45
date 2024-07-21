@@ -1,0 +1,70 @@
+def dfs_limited(graph, node, limit):
+  """
+  Performs Depth-Limited Search (DLS) on a graph to a specified depth limit.
+
+  Args:
+      graph: A dictionary representing the graph, where keys are nodes and values are lists of adjacent nodes.
+      node: The starting node for the search.
+      limit: The depth limit for the search.
+
+  Returns:
+      True if the target is found within the depth limit, False otherwise.
+  """
+  visited = set()  # Set to keep track of visited nodes
+  stack = [node]  # Stack for DLS traversal
+
+  while stack:
+    current_node = stack.pop()  # Pop the last node from the stack
+    visited.add(current_node)  # Mark current node as visited
+
+    if current_node == target:  # Check if target node is found
+      return True
+
+    if limit > 0:  # Explore neighbors if depth limit not reached
+      for neighbor in reversed(graph[current_node]):  # Explore in reverse order
+        if neighbor not in visited:
+          stack.append(neighbor)
+      limit -= 1  # Decrement depth limit for neighbors
+
+  return False  # Target not found within the limit
+
+
+def iddfs(graph, start_node, target):
+  """
+  Performs Iterative Deepening Depth-First Search (IDDFS) on a graph.
+
+  Args:
+      graph: A dictionary representing the graph, where keys are nodes and values are lists of adjacent nodes.
+      start_node: The starting node for the search.
+      target: The target node to find.
+
+  Returns:
+      True if the target is found, False otherwise.
+  """
+  depth = 0
+  while True:
+    if dfs_limited(graph.copy(), start_node, depth):  # Use copy to avoid modifying original graph
+      return True
+    depth += 1  # Increase depth limit for next iteration
+
+
+# Example usage
+graph = {
+  'A': ['B', 'C'],
+  'B': ['D', 'E'],
+  'C': ['F'],
+  'D': [],
+  'E': ['F'],
+  'F': ['G'],
+  'G': []
+}
+
+start_node = 'A'
+target = 'G'
+
+found = iddfs(graph, start_node, target)
+
+if found:
+  print(f"Target {target} found using IDDFS!")
+else:
+  print(f"Target {target} not found in the graph.")

@@ -1,0 +1,23 @@
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Sample data (replace with your actual data)
+X = np.array([[1, 2, 1], [2, 1, 2], [3, 2, 1], [1, 4, 1], [5, 1, 0]])
+y = np.array(['A', 'A', 'B', 'A', 'B'])  # Assuming categorical labels
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Create the LDA classifier
+clf = LinearDiscriminantAnalysis()
+
+# Train the model on the training data
+clf.fit(X_train, y_train)
+
+# Predict class labels for the testing data
+y_pred = clf.predict(X_test)
+
+# Evaluate the accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")

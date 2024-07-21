@@ -1,0 +1,28 @@
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Sample data (replace with your actual data)
+X = [[1, 2, 1], [2, 1, 2], [3, 2, 1], [1, 4, 1], [5, 1, 0]]
+y = [1, 1, 0, 1, 0]  # Assuming binary classification (0 or 1)
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Create the Logistic Regression classifier
+clf = LogisticRegression()
+
+# Train the model on the training data
+clf.fit(X_train, y_train)
+
+# Predict class labels for the testing data
+y_pred = clf.predict(X_test)
+
+# Evaluate the accuracy
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+
+# Predict probability for a new data point (optional)
+new_data = [4, 3, 2]
+predicted_probability = clf.predict_proba(new_data)[0][1]
+print(f"Predicted probability of class 1 for new data: {predicted_probability:.2f}")

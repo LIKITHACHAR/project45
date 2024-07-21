@@ -1,0 +1,39 @@
+def dfs_recursive(graph, node, visited=None):
+  """
+  Performs Depth-First Search on a graph recursively.
+
+  Args:
+      graph: A dictionary representing the graph, where keys are nodes and values are lists of adjacent nodes.
+      node: The starting node for the search.
+      visited (optional): Set to keep track of visited nodes (defaults to None).
+
+  Returns:
+      A list containing the nodes visited in the order of exploration.
+  """
+  if visited is None:
+    visited = set()  # Create a set for visited nodes if not provided
+
+  visited.add(node)
+  print(node, end=" -> ")  # Print the visited node (optional)
+
+  for neighbor in graph[node]:
+    if neighbor not in visited:
+      dfs_recursive(graph, neighbor, visited)  # Recursive call for unvisited neighbors
+
+  return visited  # Optional: Return the set of visited nodes
+
+# Example usage with a simple graph
+graph = {
+  'A': ['B', 'C'],
+  'B': ['D', 'E'],
+  'C': ['F'],
+  'D': [],
+  'E': ['F'],
+  'F': []
+}
+
+start_node = 'A'
+
+visited_nodes = dfs_recursive(graph, start_node)
+
+print("\nVisited nodes in DFS order (recursive):", visited_nodes)
